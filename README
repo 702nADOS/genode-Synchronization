@@ -1,0 +1,11 @@
+Genode component code for managing synchronization.
+
+This component uses the RQ manager shared memory, data structure(Created by Paul) inorder to access the next thread to be executed. 
+
+Once the Shared array has a thread to be executed, this component accesses the thread and adds that in to the corresponding ready queue of the Processor.
+The access control is synchronized with mutual exclusion between the components. 
+
+Accessing the ready queue
+============================
+As of now the ready queue can not be accessed directly from this component, so a call is made to the scheduler(or a custom) kernel object with the corresponding thread id, which then deploys
+the thread on to the ready queue.
