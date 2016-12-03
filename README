@@ -1,11 +1,39 @@
-Genode component code for managing synchronization.
+Directory structure
+===================
+gehello - Genode component for testing kernel mechanism
+synch_rq - The user level component, should be extended and integrated
+src - Client-server code
+-----------------------------------------------------------------------
 
+gehello
+=======
+
+How to?
+1. Get the Genode (Synchronization-GC) and prepare the build folder using foc(Synchronization-GC)
+
+2. Get the gehello folder and place it in repos folder and add it to the etc/build.conf file
+
+3. Run it using make run/gehello
+
+4. This should create 5 threads(Mythreads) and add them to the repository
+
+
+Synch_rq
+=========
 This component uses the RQ manager shared memory, data structure(Created by Paul) inorder to access the next thread to be executed. 
+
+The outline of the code is in place. It should be extended to work with the kernel module, instructions are given in the main.cc file
 
 Once the Shared array has a thread to be executed, this component accesses the thread and adds that in to the corresponding ready queue of the Processor.
 The access control is synchronized with mutual exclusion between the components. 
 
-Accessing the ready queue
-============================
-As of now the ready queue can not be accessed directly from this component, so a call is made to the scheduler(or a custom) kernel object with the corresponding thread id, which then deploys
-the thread on to the ready queue.
+Flow:
+1. Get the number of ready queues available from Genode
+2. Loop over the ready queues
+3. Try to access the lock.
+4. If the locking is successfull, check the dataspace for threads to be executed and schedule(should be implemented)
+5. If the locking is unsuccessfull, goto the next ready queue and repeat the steps
+6. Update the dataspace with the corresponding values
+
+
+

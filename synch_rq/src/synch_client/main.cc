@@ -15,17 +15,6 @@
 #include "rq_manager_session/connection.h"
 #include "rq_manager/rq_buffer.h"
 
-/* Fiasco includes */
-namespace Fiasco {
-#include <l4/sys/debugger.h>
-#include <l4/sys/factory.h>
-#include <l4/sys/irq.h>
-#include <l4/sys/scheduler.h>
-#include <l4/sys/thread.h>
-#include <l4/sys/types.h>
-#include <l4/sys/rq_manager.h>
-}
-
 using namespace Genode;
 
 int main()
@@ -74,10 +63,17 @@ int main()
 	}
 
 	PINF("Got Dataspace_capabilities :)");
-
+    /*
+     * TODO Get the trace and the thread data strcture
+     *
+     * static Genode::Trace::Connection trace(1024*4096, 64*4096, 0);
+     *
+     * Trace::Threads thread_info;
+     */
 	while(1)
 	{
-		for(int i=0; i<num_rqs; i++){
+		printf("[Synch_client] Executing synch client");
+        for(int i=0; i<num_rqs; i++){
 	
 		if (cmpxchg(_lock[i], false, true)) {
 			PINF("Obtained lock, now set to: %d", *_lock);
@@ -86,11 +82,26 @@ int main()
             /*TODO : Notes Guru
              * Here this should pick up threads available in shared space
              * and use trace service to update them to the kernel ready queue
-             * 
+             *  
              * Once the function returns update the pointers head and window
              *
+             * Should be extended similar to this,
+             * Copy the threads into the thread_info structure created above
+             * and call the deply_thread method
+             *
+             *
+             * for(int k=0;k<number_of_threads_in_shared_space; k++)
+             * {
+             *      thread_info.id[k] = 
+             *      thread_info.prio[k] =  
+             * }
+             * thread_info.n = k;
+    	     * 
+             * int ret = trace.deploy_thread(threads, threads[i].prio);
+             *
+             * update the return value to shared space
              */
-			/* copy content of buf[3] to variable task */
+	
 
 			/* unset the lock again to enable access by other functions */
 			*_lock = false;
@@ -103,6 +114,4 @@ int main()
 	}
 
 
-	/* access content of buf[4] directly */
-	PINF("Got task with task_id: %d, wcet: %d, valid: %d", buf[4].task_id, buf[4].wcet, buf[4].valid);
 }
