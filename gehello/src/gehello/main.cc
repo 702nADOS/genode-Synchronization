@@ -30,18 +30,6 @@
 #include <os/config.h>
 #include <base/sleep.h>
 
-
-/* Fiasco includes */
-namespace Fiasco {
-#include <l4/sys/debugger.h>
-#include <l4/sys/factory.h>
-#include <l4/sys/irq.h>
-#include <l4/sys/scheduler.h>
-#include <l4/sys/thread.h>
-#include <l4/sys/types.h>
-#include <l4/sys/rq_manager.h>
-}
-
 /*
  * Structure used send the thread information to Genode API
  */
