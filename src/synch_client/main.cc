@@ -14,6 +14,8 @@
 #include "rq_manager_session/client.h"
 #include "rq_manager_session/connection.h"
 #include "rq_manager/rq_buffer.h"
+#include "rq_task/rq_task.h"
+#include <vector>
 
 using namespace Genode;
 
@@ -29,7 +31,7 @@ int main()
 	std::vector<int *> window;
 	
 	std::vector<Dataspace_capability> dsc;
-	std::vector<Rq_manager::Rq_task*> buf;
+	std::vector<Rq_task::Rq_task*> buf;
 	
 	/* check for the number of run queues available: 
 	 * This is the first call since rest variable depends on this
@@ -59,7 +61,7 @@ int main()
 		head.push_back((int*) ( _rqbufp[i] + (1 * sizeof(int))));
 		tail.push_back((int*) (_rqbufp[i] + (2 * sizeof(int))));
 		window.push_back((int*) (_rqbufp[i] + (3 * sizeof(int))));
-		buf.push_back((Rq_manager::Rq_task*) (_rqbufp[i] + (4 * sizeof(int)))
+		buf.push_back((Rq_task::Rq_task*) (_rqbufp[i] + (4 * sizeof(int))));
 	}
 
 	PINF("Got Dataspace_capabilities :)");
@@ -76,7 +78,7 @@ int main()
         for(int i=0; i<num_rqs; i++){
 	
 		if (cmpxchg(_lock[i], false, true)) {
-			PINF("Obtained lock, now set to: %d", *_lock);
+			//PINF("Obtained lock, now set to: %d", _lock);
 
 
             /*TODO : Notes Guru
@@ -104,7 +106,7 @@ int main()
 	
 
 			/* unset the lock again to enable access by other functions */
-			*_lock = false;
+			//*_lock = false;
 
 		} 
 		else {

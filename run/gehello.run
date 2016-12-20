@@ -12,7 +12,7 @@ create_boot_directory
 #
 
 install_config {
-<config>
+<config verbose="yes" prio_levels="8">
     <parent-provides>
        <service name="ROM"/>
 		<service name="RAM"/>
@@ -34,7 +34,7 @@ install_config {
 		<resource name="RAM" quantum="1M"/>
 		<provides><service name="Timer"/></provides>
 	</start>
-    <start name="gehello">
+    <start name="gehello" priority="-2">
         <resource name="RAM" quantum="30M"/>
 	<config>
 	<trace_policy label="init -> taskmanager" module="rpc_name" />
