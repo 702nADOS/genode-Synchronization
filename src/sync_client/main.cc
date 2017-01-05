@@ -255,7 +255,7 @@ int trace()
         }
 
         last_step[i]=info;
-}
+    }
 
 
 for(int i=0;i <num_subjects; i++){
@@ -265,6 +265,39 @@ for(int i=0;i <num_subjects; i++){
         break;
     }
 }
+
+    for (size_t i = 0; i < num_subjects; i++) {
+        Trace::CPU_info info = trace1.cpu_info(subjects[i]);
+        //Trace::RAM_info ram_info = trace1.ram_info(subjects[i]);
+        if(strcmp(info.session_label().string(), "init")!=0&&strcmp(info.session_label().string(), "init -> idle")!=0) {
+
+            threads[i].id = info.id();
+            threads[i].prio = info.prio();
+            strncpy(threads[i].name, info.thread_name().string(), 9);
+
+            if( (strcmp(threads[i].name, "MyThread", 8) == 0)) // Only the MyThread thread ids are being extracted
+            {
+              //  tid[k] = threads[i].id;
+                ttid.id[k] = info.id();; // This is the id of the  threads in the trace file
+                ttid.prio[k] = info.prio();
+                k++;
+            } 
+            ttid.n = 5; // Number of threads to be sent
+            printf("ID:%d %lld prio:%d  thread_id: %lx %s name:%s\n",
+                    subjects[i].id,
+                    (info.execution_time().value-last_step[i].execution_time().value)/(timestamp*10),
+                    info.prio(),
+                    info.id(),
+                    info.session_label().string(),
+                    info.thread_name().string());
+        }
+
+        if(strcmp(info.thread_name().string(), "idle")==0) {
+            idle=100-((info.execution_time().value-last_step[i].execution_time().value)/(timestamp*10));
+        }
+
+        last_step[i]=info;
+    }
 
 printf("\n--- test-trace finished ---\n\n");
 return 0;

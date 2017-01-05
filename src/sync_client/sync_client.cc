@@ -57,7 +57,7 @@ namespace Sync_client{
 		tlist.n = tid.n;
 		Fiasco::l4_sched_param_t params = Fiasco::l4_sched_param(prio);
 
-		Fiasco::l4_msgtag_t tag = Fiasco::l4_scheduler_deploy_thread(Fiasco::L4_BASE_SCHEDULER_CAP,	tlist, &params);
+		Fiasco::l4_msgtag_t tag = Fiasco::l4_scheduler_deploy_thread(Fiasco::L4_BASE_SCHEDULER_CAP, tlist, &params);
 		if (Fiasco::l4_error(tag)){
 			PWRN("Scheduling thread has failed %lx %lx %d", tid.id[0], tid.id[1], tlist.n);
 			return 0;
