@@ -11,9 +11,7 @@
 #include <base/env.h>
 #include <base/printf.h>
 #include <spec/arm/cpu/atomic.h> /* atomic access to int values on arm CPUs */
-#include "rq_manager_session/client.h"
-#include "rq_manager_session/connection.h"
-#include "rq_manager/rq_buffer.h"
+#include "sched_controller/rq_buffer.h"
 #include "rq_task/rq_task.h"
 #include <vector>
 

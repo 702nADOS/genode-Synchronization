@@ -8,7 +8,8 @@ class Sync_client
 		Sync_client();
 		int deploy_thread(Genode::Trace::Threads tid,  unsigned prio);
 		
-	protected:
+	private:
+		
 
 
 };
