@@ -196,10 +196,13 @@ int main()
     PDBG("Sync client started.\n");
 
     Sched_controller::Connection sched;
+    Sync_client::Sync_client syn;
+
+    Genode::Dataspace_capability ds_cap=syn.init_ds(128,2);
+
+    sched.set_sync_ds(ds_cap);
 
     sched.are_you_ready();
-
-    Sync_client::Sync_client syn;
 
     Thread_creator t[5];
 

@@ -62,4 +62,12 @@ namespace Sync_client{
 		}
 		return 1;
 	}
+
+	Genode::Dataspace_capability Sync_client::init_ds(int num_rqs, int num_cores)
+	{
+		int ds_size = num_cores*(4 * sizeof(int)) + (num_rqs * sizeof(Rq_task::Rq_task));
+		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
+		_rqs = Genode::env()->rm_session()->attach(_ds);
+		return _ds;
+	}
 }
