@@ -7,7 +7,7 @@ class Sync_client
 {
 	public:
 		Sync_client();
-		int deploy_thread(Genode::Trace::Threads tid,  unsigned prio);
+		int deploy_thread(int *list);
 		Genode::Dataspace_capability init_ds(int num_rqs, int num_cores);
 		
 	private:

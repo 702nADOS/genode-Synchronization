@@ -125,71 +125,8 @@ int foo()
 
 }
 
-struct thread_info {
-    unsigned long id;
-    char name[32];
-    unsigned prio;  
-}threads[15];
-
-
 using namespace Genode;
 using namespace Fiasco;
-
-/*
- * Thread class
- */
-class Mythread : public Genode::Thread<2*4096>
-{
-    public:
-
-        Mythread() : Thread("MyThread") { }
-
-        void func()
-        {
-            PINF("I am a thread!\n\n");
-        }
-
-        void entry()
-        {
-            func();
-        }
-
-};
-
-/* 
- * Helper class to create the threads
- */
-class Thread_creator
-{
-    Mythread myt;
-    public:
-    int run_thread(int);
-    int create_thread(int);
-};
-
-/*
- * Thread is run from here
- * The entry function of Mythread class will run
- */
-int Thread_creator::run_thread(int thread_num)
-{
-    myt.start();
-
-    Genode::Thread_capability mycap = myt.cap();
-    PINF("Got Thread capability information. %lx\n", myt.tid());
-
-    myt.join();
-}
-
-int Thread_creator::create_thread(int thread_num)
-{
-    printf("Now we will create thread %i.\n", thread_num);
-
-    Genode::Thread_capability mycap = myt.cap();
-    PINF("Got Thread capability information. %lx\n", myt.tid());
-
-    return 0;
-}
 
 int main()
 {
@@ -200,15 +137,17 @@ int main()
 
     Genode::Dataspace_capability ds_cap=syn.init_ds(128,2);
 
+    int list[100];
+    list[0]=1;
+    list[1]=150;
+    list[2]=128;
+
+    syn.deploy_thread(list);
+
     sched.set_sync_ds(ds_cap);
 
     sched.are_you_ready();
 
-    Thread_creator t[5];
-
-    for (int i = 0; i < 5; i++) {
-        t[i].run_thread(i);
-    }
 
     printf("Sync client stopped. We should not get here!\n");
 

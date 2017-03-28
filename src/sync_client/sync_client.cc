@@ -25,6 +25,7 @@ namespace Fiasco {
 #include <l4/sys/scheduler.h>
 #include <l4/sys/thread.h>
 #include <l4/sys/types.h>
+#include <l4/sys/consts.h>
 }
 
 using namespace Genode;
@@ -36,30 +37,17 @@ namespace Sync_client{
 	
 	Sync_client::Sync_client() {}
 
-	int Sync_client::deploy_thread(Genode::Trace::Threads tid,  unsigned prio) //gmc
+	int Sync_client::deploy_thread(int *list) //gmc
 	{
-		PWRN("Deploying threads");
-
-		Fiasco::l4_sched_thread_list tlist;
-
-		/*
-		 * Fill the thread list to the kernel list
-		 * Have to make the same structure on both sides for transparency
-		 */
-
-		for(int i = 0; i< tid.n; i++)
+		int ds_size = ((1+2*list[0])*sizeof(int));
+		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
+		int *newlist = Genode::env()->rm_session()->attach(_ds);
+		for(int i=0;i<(1+2*list[0]);i++)
 		{
-			tlist.list[i] = tid.id[i];
-			tlist.prio[i] = tid.prio[i];
+			newlist[i]=list[i];
 		}
-		tlist.n = tid.n;
-		Fiasco::l4_sched_param_t params = Fiasco::l4_sched_param(prio);
-
-		Fiasco::l4_msgtag_t tag = Fiasco::l4_scheduler_deploy_thread(Fiasco::L4_BASE_SCHEDULER_CAP, tlist, &params);
-		if (Fiasco::l4_error(tag)){
-			PWRN("Scheduling thread has failed %lx %lx %d", tid.id[0], tid.id[1], tlist.n);
-			return 0;
-		}
+		Genode::env()->cpu_session()->deploy_queue(_ds);		
+		
 		return 1;
 	}
 
