@@ -16,6 +16,7 @@
 #include <vector>
 
 #include <trace_session/connection.h>
+#include <timer_session/connection.h>
 
 /* Fiasco includes */
 namespace Fiasco {
@@ -35,7 +36,17 @@ using namespace Genode;
 
 namespace Sync_client{
 	
-	Sync_client::Sync_client() {}
+	Sync_client::Sync_client() {
+		Genode::Dataspace_capability ds_cap=init_ds(32,1);
+
+    PDBG("Sync client started.\n");
+
+    sched.set_sync_ds(ds_cap);
+
+    PDBG("Sync creation done!\n");
+
+    the_cycle();
+}
 
 	int Sync_client::deploy_thread(int *list) //gmc
 	{
@@ -53,9 +64,36 @@ namespace Sync_client{
 
 	Genode::Dataspace_capability Sync_client::init_ds(int num_rqs, int num_cores)
 	{
+		Genode::printf("Init syn ds\n");
 		int ds_size = num_cores*(4 * sizeof(int)) + (num_rqs * sizeof(Rq_task::Rq_task));
 		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
-		_rqs = Genode::env()->rm_session()->attach(_ds);
+		_rqs = new Sched_controller::Rq_buffer<Rq_task::Rq_task>[num_cores];
+		for (int i = 0; i < num_cores; i++) {
+			_rqs[i].init_w_shared_ds(_ds);
+		}
 		return _ds;
+	}
+
+	void Sync_client::the_cycle()
+	{
+		
+		    while(1){
+			int list[100];
+			int counter=1;
+			sched.are_you_ready();
+			Rq_task::Rq_task *dequeued_task;
+			while(1)
+			{
+				_rqs->deq(&dequeued_task);
+				if(dequeued_task==nullptr) break;
+				PDBG("id: %d\n",(*dequeued_task).task_id);
+				list[2*counter-1]=(*dequeued_task).task_id;
+				list[2*counter]=128;
+				counter++;
+			}
+			list[0]=counter-1;
+			deploy_thread(list);
+			PDBG("Deploy\n");
+    		    }
 	}
 }

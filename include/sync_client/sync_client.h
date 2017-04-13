@@ -1,5 +1,6 @@
 #include <trace_session/connection.h>
 #include "sched_controller/rq_buffer.h"
+#include "sched_controller_session/connection.h"
 
 namespace Sync_client{
 
@@ -11,6 +12,8 @@ class Sync_client
 		Genode::Dataspace_capability init_ds(int num_rqs, int num_cores);
 		
 	private:
+		void the_cycle();
+		Sched_controller::Connection sched;
 		Sched_controller::Rq_buffer<Rq_task::Rq_task> *_rqs;
 
 

@@ -130,26 +130,8 @@ using namespace Fiasco;
 
 int main()
 {
-    PDBG("Sync client started.\n");
-
-    Sched_controller::Connection sched;
+    PDBG("Sync fuck!");
     Sync_client::Sync_client syn;
-
-    Genode::Dataspace_capability ds_cap=syn.init_ds(128,2);
-
-    int list[100];
-    list[0]=1;
-    list[1]=150;
-    list[2]=128;
-
-    syn.deploy_thread(list);
-
-    sched.set_sync_ds(ds_cap);
-
-    sched.are_you_ready();
-
-
-    printf("Sync client stopped. We should not get here!\n");
-
+	
     return 0;
 }
