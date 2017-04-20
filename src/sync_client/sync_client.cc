@@ -39,11 +39,7 @@ namespace Sync_client{
 	Sync_client::Sync_client() {
 		Genode::Dataspace_capability ds_cap=init_ds(32,1);
 
-    PDBG("Sync client started.\n");
-
     sched.set_sync_ds(ds_cap);
-
-    PDBG("Sync creation done!\n");
 
     the_cycle();
 }
@@ -64,7 +60,6 @@ namespace Sync_client{
 
 	Genode::Dataspace_capability Sync_client::init_ds(int num_rqs, int num_cores)
 	{
-		Genode::printf("Init syn ds\n");
 		int ds_size = num_cores*(4 * sizeof(int)) + (num_rqs * sizeof(Rq_task::Rq_task));
 		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
 		_rqs = new Sched_controller::Rq_buffer<Rq_task::Rq_task>[num_cores];
@@ -86,14 +81,12 @@ namespace Sync_client{
 			{
 				_rqs->deq(&dequeued_task);
 				if(dequeued_task==nullptr) break;
-				PDBG("id: %d\n",(*dequeued_task).task_id);
 				list[2*counter-1]=(*dequeued_task).task_id;
-				list[2*counter]=128;
+				list[2*counter]=(*dequeued_task).prio;
 				counter++;
 			}
 			list[0]=counter-1;
 			deploy_thread(list);
-			PDBG("Deploy\n");
     		    }
 	}
 }

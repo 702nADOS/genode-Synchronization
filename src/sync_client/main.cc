@@ -130,7 +130,6 @@ using namespace Fiasco;
 
 int main()
 {
-    PDBG("Sync fuck!");
     Sync_client::Sync_client syn;
 	
     return 0;
