@@ -55,7 +55,6 @@ namespace Sync_client{
 		}
 		Genode::env()->cpu_session()->deploy_queue(_ds);
 		Genode::env()->ram_session()->free(_ds);
-		
 		return 1;
 	}
 
