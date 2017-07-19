@@ -47,14 +47,14 @@ namespace Sync_client{
 	int Sync_client::deploy_thread(int *list) //gmc
 	{
 		int ds_size = ((1+2*list[0])*sizeof(int));
-		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
+		Genode::Ram_dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
 		int *newlist = Genode::env()->rm_session()->attach(_ds);
 		for(int i=0;i<(1+2*list[0]);i++)
 		{
 			newlist[i]=list[i];
 		}
 		Genode::env()->cpu_session()->deploy_queue(_ds);		
-		
+		Genode::env()->ram_session()->free(_ds);
 		return 1;
 	}
 
