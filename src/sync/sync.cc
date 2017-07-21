@@ -32,11 +32,11 @@ namespace Fiasco {
 using namespace Genode;
 
 /* local includes */
-#include "sync_client/sync_client.h"
+#include "sync/sync.h"
 
-namespace Sync_client{
+namespace Sync{
 	
-	Sync_client::Sync_client() {
+	Sync::Sync() {
 		Genode::Dataspace_capability ds_cap=init_ds(32,1);
 
     sched.set_sync_ds(ds_cap);
@@ -44,7 +44,7 @@ namespace Sync_client{
     the_cycle();
 }
 
-	int Sync_client::deploy_thread(int *list) //gmc
+	int Sync::deploy_thread(int *list) //gmc
 	{
 		int ds_size = ((1+2*list[0])*sizeof(int));
 		Genode::Ram_dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
@@ -58,7 +58,7 @@ namespace Sync_client{
 		return 1;
 	}
 
-	Genode::Dataspace_capability Sync_client::init_ds(int num_rqs, int num_cores)
+	Genode::Dataspace_capability Sync::init_ds(int num_rqs, int num_cores)
 	{
 		int ds_size = num_cores*(4 * sizeof(int)) + (num_rqs * sizeof(Rq_task::Rq_task));
 		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
@@ -69,7 +69,7 @@ namespace Sync_client{
 		return _ds;
 	}
 
-	void Sync_client::the_cycle()
+	void Sync::the_cycle()
 	{
 		
 		    while(1){

@@ -17,13 +17,72 @@
 
 #include "sched_controller_session/connection.h"
 
-using namespace Genode;
+//using namespace Genode;
 
-#include "sync_client/sync_client.h"
+#include "sync/sync.h"
+#include "sync/sync_session.h"
 #include <base/trace/types.h>
 #include <timer_session/connection.h>
+#include <cap_session/connection.h>
+#include <os/server.h>
+#include <root/component.h>
+#include <base/signal.h>
+#include <base/thread_state.h>
+#include <base/sleep.h>
 
 using namespace Genode;
+
+namespace Sync
+{
+
+	struct Session_component : Genode::Rpc_object<Session>
+	{
+
+		private:
+
+			Sync *_sync = nullptr;
+
+		public:
+
+			void deploy(Genode::Dataspace_capability ds_cap, int type, int core)
+			{
+				
+			}
+
+			Session_component(Sync *sync)
+			: Genode::Rpc_object<Session>()
+			{
+				_sync = sync;
+			}
+
+	};
+
+	class Root_component : public Genode::Root_component<Session_component>
+	{
+
+		private:
+
+			Sync *_sync = nullptr;
+
+		protected:
+
+			Session_component *_create_session(const char *args)
+			{
+				return new (md_alloc()) Session_component(_sync);
+			}
+
+		public:
+
+			Root_component(Genode::Rpc_entrypoint *ep,
+			               Genode::Allocator *allocator,
+			               Sync *sync)
+			: Genode::Root_component<Session_component>(ep, allocator)
+			{
+				_sync = sync;
+			}
+	};
+
+}
 
 int foo()
 {
@@ -80,7 +139,7 @@ int foo()
      */
 	while(1)
 	{
-		printf("[Synch_client] Executing synch client");
+		Genode::printf("[Synch_client] Executing synch client");
         for(int i=0; i<num_rqs; i++){
 	
 		if (cmpxchg(_lock[i], false, true)) {
@@ -125,12 +184,27 @@ int foo()
 
 }
 
+
+
 using namespace Genode;
 using namespace Fiasco;
 
 int main()
 {
-    Sync_client::Sync_client syn;
-	
-    return 0;
+    Sync::Sync sync;
+
+	Cap_connection cap;
+
+	static Sliced_heap sliced_heap(env()->ram_session(),
+	                               env()->rm_session());
+
+	enum { STACK_SIZE = 4096 };
+	static Rpc_entrypoint ep(&cap, STACK_SIZE, "sync_ep");
+
+	static Sync::Root_component sync_root(&ep, &sliced_heap, &sync);
+	env()->parent()->announce(ep.manage(&sync_root)); 
+
+	Genode::sleep_forever();
+
+	return 0;
 }
