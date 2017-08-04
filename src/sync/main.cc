@@ -44,9 +44,9 @@ namespace Sync
 
 		public:
 
-			void deploy(Genode::Dataspace_capability ds_cap, int type, int core)
+			void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core)
 			{
-				
+				_sync->deploy(sync_ds_cap,type,core);
 			}
 
 			Session_component(Sync *sync)

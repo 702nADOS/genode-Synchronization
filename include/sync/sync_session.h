@@ -13,7 +13,7 @@ namespace Sync {
 
 		static const char *service_name() { return "sync"; }
 
-		virtual void deploy(Genode::Dataspace_capability ds_cap, int type, int core) = 0;
+		virtual void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core) = 0;
 
 		GENODE_RPC(Rpc_deploy, void, deploy, Genode::Dataspace_capability, int, int);
 
