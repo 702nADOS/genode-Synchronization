@@ -36,57 +36,15 @@ using namespace Genode;
 
 namespace Sync{
 	
-	Sync::Sync() {
-		Genode::Dataspace_capability ds_cap=init_ds(32,1);
-
-    sched.set_sync_ds(ds_cap);
-
-    the_cycle();
+Sync::Sync()
+{
+	//get num cores from monitor
+	num_cores=mon_manager.get_num_cores();
 }
 
-	int Sync::deploy_thread(int *list) //gmc
+void Sync::deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core)
 	{
-		int ds_size = ((1+2*list[0])*sizeof(int));
-		Genode::Ram_dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
-		int *newlist = Genode::env()->rm_session()->attach(_ds);
-		for(int i=0;i<(1+2*list[0]);i++)
-		{
-			newlist[i]=list[i];
-		}
-		Genode::env()->cpu_session()->deploy_queue(_ds);
-		Genode::env()->ram_session()->free(_ds);
-		return 1;
-	}
-
-	Genode::Dataspace_capability Sync::init_ds(int num_rqs, int num_cores)
-	{
-		int ds_size = num_cores*(4 * sizeof(int)) + (num_rqs * sizeof(Rq_task::Rq_task));
-		Genode::Dataspace_capability _ds=Genode::env()->ram_session()->alloc(ds_size);
-		_rqs = new Sched_controller::Rq_buffer<Rq_task::Rq_task>[num_cores];
-		for (int i = 0; i < num_cores; i++) {
-			_rqs[i].init_w_shared_ds(_ds);
-		}
-		return _ds;
-	}
-
-	void Sync::the_cycle()
-	{
-		
-		    while(1){
-			int list[100];
-			int counter=1;
-			sched.are_you_ready();
-			Rq_task::Rq_task *dequeued_task;
-			while(1)
-			{
-				_rqs->deq(&dequeued_task);
-				if(dequeued_task==nullptr) break;
-				list[2*counter-1]=(*dequeued_task).task_id;
-				list[2*counter]=(*dequeued_task).prio;
-				counter++;
-			}
-			list[0]=counter-1;
-			deploy_thread(list);
-    		    }
+		Genode::printf("deploy on core %d with strategy %d\n", core, type);
+		Genode::env()->cpu_session()->deploy_queue(sync_ds_cap);		
 	}
 }
