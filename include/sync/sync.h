@@ -1,3 +1,4 @@
+#include <base/heap.h>
 #include <trace_session/connection.h>
 #include "sched_controller/rq_buffer.h"
 #include "sched_controller_session/connection.h"
