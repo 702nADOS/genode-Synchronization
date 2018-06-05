@@ -9,7 +9,8 @@ namespace Sync{
 class Sync
 {
 	public:
-		Sync();
+		Genode::Env &_env;
+		Sync(Genode::Env &env);
 		void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core);
 		
 	private:

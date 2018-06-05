@@ -36,7 +36,7 @@ using namespace Genode;
 
 namespace Sync{
 	
-Sync::Sync()
+Sync::Sync(Genode::Env &env):_env(env)
 {
 	//get num cores from monitor
 	num_cores=mon_manager.get_num_cores();
