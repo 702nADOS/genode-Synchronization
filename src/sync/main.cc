@@ -44,7 +44,7 @@ namespace Sync
 			Sync *_sync = nullptr;
 
 		public:
-
+			enum { CAP_QUOTA = 2 };
 			void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core)
 			{
 				_sync->deploy(sync_ds_cap,type,core);
@@ -76,7 +76,7 @@ namespace Sync
 
 		public:
 
-			Root_component(Genode::Rpc_entrypoint &ep,
+			Root_component(Genode::Entrypoint &ep,
 			               Genode::Allocator &allocator,
 			               Sync *sync)
 			: Genode::Root_component<Session_component>(ep, allocator)
@@ -224,7 +224,7 @@ struct Main
 	Genode::Sliced_heap sliced_heap{_env.ram(),
 	                               _env.rm()};	
 	                               
-	Sync::Root_component _sync_root(_ep, sliced_heap, &sync);    
+	Sync::Root_component _sync_root{_ep, sliced_heap, &sync};    
 	
 	Main(Genode::Env &env) : _env(env), _ep(_env.ep())
 	{

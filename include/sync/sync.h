@@ -14,7 +14,7 @@ class Sync
 		void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core);
 		
 	private:
-		int num_cores;
-		Mon_manager::Connection mon_manager;
+		int num_cores {};
+		Mon_manager::Connection mon_manager {};
 };
 }

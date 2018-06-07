@@ -19,6 +19,7 @@
 #include <timer_session/connection.h>
 
 /* Fiasco includes */
+
 namespace Fiasco {
 #include <l4/sys/debugger.h>
 #include <l4/sys/factory.h>
@@ -30,6 +31,7 @@ namespace Fiasco {
 }
 
 using namespace Genode;
+//using namespace Fiasco;
 
 /* local includes */
 #include "sync/sync.h"
@@ -44,7 +46,7 @@ Sync::Sync(Genode::Env &env):_env(env)
 
 void Sync::deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core)
 	{
-		Genode::printf("deploy on core %d with strategy %d\n", core, type);
-		Genode::env()->cpu_session()->deploy_queue(sync_ds_cap);		
+		Genode::log("deploy on core %d with strategy %d\n", core, type);
+		_env.cpu().deploy_queue(sync_ds_cap);		
 	}
 }
