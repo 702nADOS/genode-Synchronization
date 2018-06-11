@@ -23,9 +23,10 @@
 #include "sync/sync_session.h"
 #include <base/trace/types.h>
 #include <timer_session/connection.h>
-#include <cap_session/connection.h>
+//#include <cap_session/connection.h>
 #include <os/server.h>
 #include <root/component.h>
+#include <base/component.h>
 #include <base/signal.h>
 #include <base/thread_state.h>
 #include <base/sleep.h>
@@ -43,7 +44,7 @@ namespace Sync
 			Sync *_sync = nullptr;
 
 		public:
-
+			enum { CAP_QUOTA = 2 };
 			void deploy(Genode::Dataspace_capability sync_ds_cap, int type, int core)
 			{
 				_sync->deploy(sync_ds_cap,type,core);
@@ -54,6 +55,8 @@ namespace Sync
 			{
 				_sync = sync;
 			}
+			Session_component(Session_component const &);
+			Session_component &operator = (Session_component const &);
 
 	};
 
@@ -66,25 +69,27 @@ namespace Sync
 
 		protected:
 
-			Session_component *_create_session(const char *args)
+			Session_component *_create_session(const char *)
 			{
 				return new (md_alloc()) Session_component(_sync);
 			}
 
 		public:
 
-			Root_component(Genode::Rpc_entrypoint *ep,
-			               Genode::Allocator *allocator,
+			Root_component(Genode::Entrypoint &ep,
+			               Genode::Allocator &allocator,
 			               Sync *sync)
 			: Genode::Root_component<Session_component>(ep, allocator)
 			{
 				_sync = sync;
 			}
+			Root_component(const Root_component &);
+			Root_component &operator = (const Root_component &);
 	};
 
 }
 
-int foo()
+int foo(Genode::Env &_env)
 {
 	//Rq_manager::Connection rqm;
 	
@@ -120,7 +125,8 @@ int foo()
 		/*  Attach dataspace capability to the _rqbufp pointer, i.e.
 		 * the shared memory starts at the pointer position _rqbufp 
 		 */
-		_rqbufp.push_back(env()->rm_session()->attach(dsc[i]));
+
+		_rqbufp.push_back(_env.rm().attach(dsc[i]));
 		
 		_lock.push_back( (int*) (_rqbufp[i] + (0 * sizeof(int))));
 		head.push_back((int*) ( _rqbufp[i] + (1 * sizeof(int))));
@@ -187,24 +193,48 @@ int foo()
 
 
 using namespace Genode;
-using namespace Fiasco;
-
+//using namespace Fiasco;
+/*
 int main()
 {
     Sync::Sync sync;
 
 	Cap_connection cap;
+	Genode::Env &_env;
 
-	static Sliced_heap sliced_heap(env()->ram_session(),
-	                               env()->rm_session());
+	static Sliced_heap sliced_heap(_env.ram(),
+	                               _env.rm());
 
 	enum { STACK_SIZE = 4096 };
 	static Rpc_entrypoint ep(&cap, STACK_SIZE, "sync_ep");
 
 	static Sync::Root_component sync_root(&ep, &sliced_heap, &sync);
-	env()->parent()->announce(ep.manage(&sync_root)); 
+	_env.parent().announce(ep.manage(&sync_root)); 
 
 	Genode::sleep_forever();
 
 	return 0;
 }
+*/
+struct Main
+{	
+	Genode::Env &_env;
+	Genode::Entrypoint &_ep;
+	Sync::Sync sync {_env};
+	Genode::Sliced_heap sliced_heap{_env.ram(),
+	                               _env.rm()};	
+	                               
+	Sync::Root_component _sync_root{_ep, sliced_heap, &sync};    
+	
+	Main(Genode::Env &env) : _env(env), _ep(_env.ep())
+	{
+		_env.parent().announce(_ep.manage(_sync_root));
+	}                           
+	                               
+};
+
+void Component::construct(Genode::Env &env) { static Main main(env); }
+
+
+
+
