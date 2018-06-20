@@ -16,7 +16,7 @@
 #include <vector>
 
 #include "sched_controller_session/connection.h"
-
+#include <libc/component.h>
 //using namespace Genode;
 
 #include "sync/sync.h"
@@ -218,7 +218,7 @@ int main()
 */
 struct Main
 {	
-	Genode::Env &_env;
+	Libc::Env &_env;
 	Genode::Entrypoint &_ep;
 	Sync::Sync sync {_env};
 	Genode::Sliced_heap sliced_heap{_env.ram(),
@@ -226,15 +226,18 @@ struct Main
 	                               
 	Sync::Root_component _sync_root{_ep, sliced_heap, &sync};    
 	
-	Main(Genode::Env &env) : _env(env), _ep(_env.ep())
+	Main(Libc::Env &env) : _env(env), _ep(_env.ep())
 	{
 		_env.parent().announce(_ep.manage(_sync_root));
 	}                           
 	                               
 };
 
-void Component::construct(Genode::Env &env) { static Main main(env); }
-
+//void Component::construct(Genode::Env &env) { static Main main(env); }
+void Libc::Component::construct(Libc::Env &env)
+{
+	Libc::with_libc([&] () { static Main main(env); });
+}
 
 
 
