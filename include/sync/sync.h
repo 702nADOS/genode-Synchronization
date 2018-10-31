@@ -15,6 +15,6 @@ class Sync
 		
 	private:
 		int num_cores {};
-		Mon_manager::Connection mon_manager {};
+		Mon_manager::Connection mon_manager {_env};
 };
 }
